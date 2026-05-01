@@ -1,10 +1,12 @@
 import React from 'react';
 import { useUser } from '../contexts/UserContext';
-import { Trophy, Star, Target, Database, Activity, FlaskConical } from 'lucide-react';
+import { Trophy, Star, Target, Database, Activity, FlaskConical, Brain } from 'lucide-react';
 import { ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts';
+import QuizEngine from './QuizEngine';
 
 export default function Dashboard() {
   const { level, xp, badges, dataLogs, progressPercent, nextLevelXp } = useUser();
+  const [isQuizOpen, setIsQuizOpen] = React.useState(false);
 
   // Mock radar data based on level for visual appeal
   const masteryData = [
@@ -17,11 +19,19 @@ export default function Dashboard() {
 
   return (
     <div className="p-6 h-full flex flex-col max-w-7xl mx-auto overflow-y-auto">
-      <header className="mb-8">
-        <h1 className="text-3xl font-black text-white flex items-center gap-3">
-          <Activity className="text-amber-500" /> Scientist Dashboard
-        </h1>
-        <p className="text-slate-400 mt-1">Track your physics mastery, recorded experiment data, and achievements.</p>
+      <header className="mb-8 flex justify-between items-start">
+        <div>
+          <h1 className="text-3xl font-black text-white flex items-center gap-3">
+            <Activity className="text-amber-500" /> Scientist Dashboard
+          </h1>
+          <p className="text-slate-400 mt-1">Track your physics mastery, recorded experiment data, and achievements.</p>
+        </div>
+        <button 
+          onClick={() => setIsQuizOpen(true)}
+          className="bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2.5 rounded-lg font-bold text-sm shadow-lg shadow-indigo-900/50 transition-colors flex items-center gap-2"
+        >
+          <Brain size={18} /> Take Adaptive Quiz
+        </button>
       </header>
 
       <div className="grid grid-cols-3 gap-6 mb-8">
@@ -120,6 +130,8 @@ export default function Dashboard() {
           </div>
         )}
       </div>
+
+      <QuizEngine isOpen={isQuizOpen} onClose={() => setIsQuizOpen(false)} />
     </div>
   );
 }

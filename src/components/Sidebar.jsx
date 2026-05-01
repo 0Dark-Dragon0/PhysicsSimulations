@@ -1,5 +1,5 @@
 import React from 'react';
-import { Beaker, Zap, Layers, Network, Activity, ChevronRight, GraduationCap } from 'lucide-react';
+import { Beaker, Zap, Layers, Network, Activity, ChevronRight, GraduationCap, Sigma } from 'lucide-react';
 import { useTutorial } from '../contexts/TutorialContext';
 import UserStats from './UserStats';
 
@@ -79,7 +79,7 @@ const LABS = [
   }
 ];
 
-export default function Sidebar({ activeLab, setActiveLab }) {
+export default function Sidebar({ activeLab, setActiveLab, onOpenFormulas }) {
   const { isGuidedMode, toggleGuidedMode, setActiveLabId } = useTutorial();
 
   const handleLabChange = (id) => {
@@ -123,7 +123,7 @@ export default function Sidebar({ activeLab, setActiveLab }) {
               </button>
               
               {/* Expand Topics if Active */}
-              {isActive && (
+              {isActive && lab.topics && (
                 <div className="mt-1 mb-3 ml-11 border-l-2 border-slate-800 pl-3 py-1 space-y-2">
                   {lab.topics.map((topic, i) => (
                     <div key={i} className="text-xs text-slate-500 leading-tight">
@@ -137,12 +137,20 @@ export default function Sidebar({ activeLab, setActiveLab }) {
         })}
       </div>
 
-      <div className="p-4 border-t border-slate-800 flex flex-col gap-3">
+      <div className="p-4 border-t border-slate-800 space-y-3">
+        <button 
+          onClick={onOpenFormulas}
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg font-bold transition-all text-indigo-400 hover:bg-indigo-900/20 hover:text-indigo-300 border border-indigo-900/50"
+        >
+          <Sigma size={18} />
+          <span>Formula Engine</span>
+        </button>
+
         <button 
           onClick={toggleGuidedMode}
-          className={`w-full py-2.5 rounded-lg flex items-center justify-center gap-2 font-bold text-sm transition-all shadow-lg ${
+          className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg font-bold transition-all ${
             isGuidedMode 
-              ? 'bg-emerald-600 text-white shadow-emerald-900/50 ring-2 ring-emerald-400' 
+              ? 'bg-emerald-600 text-white shadow-[0_0_15px_rgba(16,185,129,0.4)] ring-2 ring-emerald-400 ring-offset-2 ring-offset-slate-950' 
               : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
           }`}
         >

@@ -1,6 +1,7 @@
 import React from 'react';
 import { useTutorial } from '../contexts/TutorialContext';
-import { ChevronRight, ChevronLeft, Lightbulb, GraduationCap, X } from 'lucide-react';
+import { useSimState } from '../contexts/SimStateContext';
+import { ChevronRight, ChevronLeft, Lightbulb, GraduationCap, X, Sparkles } from 'lucide-react';
 
 export default function TeacherAssistant() {
   const { 
@@ -13,7 +14,21 @@ export default function TeacherAssistant() {
     prevStep 
   } = useTutorial();
 
+  const { simState } = useSimState();
+
   if (!isGuidedMode || !currentStepData) return null;
+
+  const getDynamicInsight = () => {
+    if (!simState || !simState.lab) return null;
+    if (simState.lab === 'Lab2') {
+      if (simState.distance < 0.005 && simState.voltage > 80) return "AI Warning: Very small gap with high voltage! In reality, this would cause dielectric breakdown (a spark) in air.";
+      if (simState.energy > 5e-8) return "AI Insight: High energy state detected! This amount of energy could power a tiny flash.";
+      if (simState.area >= 4) return "AI Insight: Massive plate area! Notice how the capacitance skyrocketed. This is how supercapacitors work (using porous materials for huge area).";
+    }
+    return null;
+  };
+
+  const dynamicInsight = getDynamicInsight();
 
   return (
     <div className="fixed bottom-6 right-6 w-96 bg-slate-900 border-2 border-emerald-500 rounded-xl shadow-[0_0_30px_rgba(16,185,129,0.3)] z-50 flex flex-col overflow-hidden animate-slide-up">
@@ -64,6 +79,17 @@ export default function TeacherAssistant() {
             <div>
               <div className="text-[10px] text-blue-400 font-bold uppercase tracking-wider mb-1">Physics Insight</div>
               <div className="text-xs text-blue-200/80 leading-relaxed">{currentStepData.physicsFact}</div>
+            </div>
+          </div>
+        )}
+
+        {/* Dynamic AI Insight */}
+        {dynamicInsight && (
+          <div className="bg-indigo-950/40 border border-indigo-500/50 rounded-lg p-3 flex gap-3 items-start animate-fade-in shadow-[0_0_15px_rgba(99,102,241,0.2)]">
+            <Sparkles size={16} className="text-indigo-400 mt-0.5 shrink-0 animate-pulse" />
+            <div>
+              <div className="text-[10px] text-indigo-400 font-bold uppercase tracking-wider mb-1">Live State Analysis</div>
+              <div className="text-xs text-indigo-200/90 leading-relaxed font-bold">{dynamicInsight}</div>
             </div>
           </div>
         )}

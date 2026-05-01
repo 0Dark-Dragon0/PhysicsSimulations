@@ -1,11 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Beaker, Settings2, Zap, FlaskConical } from 'lucide-react';
 import { useTutorial } from '../contexts/TutorialContext';
+import { useSimState } from '../contexts/SimStateContext';
 import ExperimentWizard from '../components/ExperimentWizard';
 import { experimentsData } from '../data/experiments';
 
 export default function Lab2() {
   const { isTargetActive } = useTutorial();
+  const { setSimState } = useSimState();
   const [showExperiment, setShowExperiment] = useState(false);
   const [area, setArea] = useState(1.0); // m^2 (0.1 to 5.0)
   const [distance, setDistance] = useState(0.01); // m (0.001 to 0.05)
@@ -18,6 +20,11 @@ export default function Lab2() {
   const charge = capacitance * voltage; // Coulombs
   const energy = 0.5 * capacitance * voltage * voltage; // Joules
   const electricField = voltage / distance; // V/m
+
+  // Push current simulation state to the global context for the AI Teacher to read
+  useEffect(() => {
+    setSimState({ lab: 'Lab2', area, distance, voltage, capacitance, charge, energy });
+  }, [area, distance, voltage, capacitance, charge, energy, setSimState]);
 
   // Visual scaling
   const plateWidth = Math.sqrt(area) * 150; // Visual scaling factor
