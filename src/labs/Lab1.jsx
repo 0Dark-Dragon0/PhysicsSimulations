@@ -1,8 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { PlusCircle, MinusCircle, RefreshCw, Layers, Move, Activity, Share2 } from 'lucide-react';
+import { PlusCircle, MinusCircle, RefreshCw, Layers, Move, Activity, Share2, Box } from 'lucide-react';
 import { useTutorial } from '../contexts/TutorialContext';
 import GraphEngine from '../components/GraphEngine';
 import { useUrlState } from '../hooks/useUrlState';
+import ThreeCanvas from '../components/ThreeCanvas';
+import Charge3D from '../components/Charge3D';
+import VectorField3D from '../components/VectorField3D';
 
 const VISUAL_K = 1000;
 
@@ -51,6 +54,7 @@ export default function Lab1() {
   ]);
   const [testCharge, setTestCharge] = useUrlState('lab1_test', { x: 0, y: -4, q: 0.1 });
   const [viewMode, setViewMode] = useState('field');
+  const [is3DMode, setIs3DMode] = useState(false);
   const draggingRef = useRef({ mode: 'none', id: null });
 
   // Keep ref in sync with state so canvas handler always has fresh data
@@ -197,13 +201,24 @@ export default function Lab1() {
 
   return (
     <div className="p-6 h-full flex flex-col max-w-7xl mx-auto">
-      <header className="mb-6">
-        <h1 className="text-3xl font-black text-white flex items-center gap-3">
-          <Layers className="text-emerald-500" /> The Potential Playground
-        </h1>
-        <p className="text-slate-400 mt-1">
-          Explore Electrostatic Potential, Electric Field, and Potential Energy. Drag charges to see real-time equipotential surfaces.
-        </p>
+      <header className="mb-6 flex justify-between items-start">
+        <div>
+          <h1 className="text-3xl font-black text-white flex items-center gap-3">
+            <Layers className="text-emerald-500" /> The Potential Playground
+          </h1>
+          <p className="text-slate-400 mt-1">
+            Explore Electrostatic Potential, Electric Field, and Potential Energy. Drag charges to see real-time equipotential surfaces.
+          </p>
+        </div>
+        
+        <button 
+          onClick={() => setIs3DMode(!is3DMode)}
+          className={`flex items-center gap-2 px-4 py-2 rounded-lg font-bold text-sm shadow-lg transition-colors ${
+            is3DMode ? 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-indigo-900/50' : 'bg-slate-800 hover:bg-slate-700 text-slate-300'
+          }`}
+        >
+          <Box size={16} /> {is3DMode ? 'Exit 3D Space' : 'Enter 3D Space'}
+        </button>
       </header>
 
       <div className="flex gap-6" style={{ height: '600px' }}>
@@ -239,15 +254,32 @@ export default function Lab1() {
             </button>
           </div>
 
-          <canvas
-            ref={canvasRef}
-            width={800} height={600}
-            className="w-full h-full cursor-crosshair touch-none"
-            onPointerDown={handlePointerDown}
-            onPointerMove={handlePointerMove}
-            onPointerUp={handlePointerUp}
-            onPointerLeave={handlePointerUp}
-          />
+          {is3DMode ? (
+            <div className="absolute inset-0 rounded-xl overflow-hidden cursor-crosshair">
+              <ThreeCanvas>
+                {(viewMode === 'field' || viewMode === 'both') && <VectorField3D charges={charges} />}
+                {charges.map(c => (
+                  <Charge3D 
+                    key={c.id} 
+                    charge={c} 
+                    onChange={(id, nx, ny) => {
+                      setCharges(prev => prev.map(ch => ch.id === id ? { ...ch, x: nx, y: ny } : ch));
+                    }} 
+                  />
+                ))}
+              </ThreeCanvas>
+            </div>
+          ) : (
+            <canvas
+              ref={canvasRef}
+              width={800} height={600}
+              className="w-full h-full cursor-crosshair touch-none"
+              onPointerDown={handlePointerDown}
+              onPointerMove={handlePointerMove}
+              onPointerUp={handlePointerUp}
+              onPointerLeave={handlePointerUp}
+            />
+          )}
 
           <div className="absolute bottom-3 left-3 bg-slate-950/80 p-2.5 rounded-lg backdrop-blur-sm text-xs font-mono text-slate-300 border border-slate-800">
             <div className="flex items-center gap-2 mb-1">

@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { Beaker, Settings2, Zap, FlaskConical } from 'lucide-react';
+import { Beaker, Settings2, Zap, FlaskConical, Box } from 'lucide-react';
 import { useTutorial } from '../contexts/TutorialContext';
 import { useSimState } from '../contexts/SimStateContext';
 import ExperimentWizard from '../components/ExperimentWizard';
 import { experimentsData } from '../data/experiments';
+import ThreeCanvas from '../components/ThreeCanvas';
+import Capacitor3D from '../components/Capacitor3D';
 
 export default function Lab2() {
   const { isTargetActive } = useTutorial();
   const { setSimState } = useSimState();
   const [showExperiment, setShowExperiment] = useState(false);
+  const [is3DMode, setIs3DMode] = useState(false);
   const [area, setArea] = useState(1.0); // m^2 (0.1 to 5.0)
   const [distance, setDistance] = useState(0.01); // m (0.001 to 0.05)
   const [voltage, setVoltage] = useState(12); // V (0 to 100)
@@ -41,12 +44,22 @@ export default function Lab2() {
             Investigate how plate area and separation distance affect capacitance and stored energy.
           </p>
         </div>
-        <button 
-          onClick={() => setShowExperiment(true)}
-          className="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg font-bold text-sm shadow-lg shadow-indigo-900/50 transition-colors flex items-center gap-2"
-        >
-          <FlaskConical size={16} /> Start Virtual Lab
-        </button>
+        <div className="flex gap-2">
+          <button 
+            onClick={() => setIs3DMode(!is3DMode)}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg font-bold text-sm shadow-lg transition-colors ${
+              is3DMode ? 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-indigo-900/50' : 'bg-slate-800 hover:bg-slate-700 text-slate-300'
+            }`}
+          >
+            <Box size={16} /> {is3DMode ? 'Exit 3D Space' : 'Enter 3D Space'}
+          </button>
+          <button 
+            onClick={() => setShowExperiment(true)}
+            className="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg font-bold text-sm shadow-lg shadow-indigo-900/50 transition-colors flex items-center gap-2"
+          >
+            <FlaskConical size={16} /> Start Virtual Lab
+          </button>
+        </div>
       </header>
       
       <div className="flex gap-6 relative" style={{ height: '600px' }}>
@@ -64,60 +77,68 @@ export default function Lab2() {
 
         {/* Main Simulation View */}
         <div className="flex-1 bg-slate-900 border border-slate-800 rounded-xl shadow-2xl relative flex flex-col items-center justify-center overflow-hidden">
-          
-          <div className="absolute top-4 left-4 flex gap-2 z-10 bg-slate-950/80 p-2 rounded-lg backdrop-blur text-xs font-mono text-slate-400">
-            C = (ε₀ · A) / d
-          </div>
+          {is3DMode ? (
+            <ThreeCanvas cameraPos={[10, 10, 10]}>
+              <Capacitor3D area={area} distance={distance} voltage={voltage} />
+            </ThreeCanvas>
+          ) : (
+            <div className="relative w-full h-full flex flex-col items-center justify-center">
+              
+              <div className="absolute top-4 left-4 flex gap-2 z-10 bg-slate-950/80 p-2 rounded-lg backdrop-blur text-xs font-mono text-slate-400">
+                C = (ε₀ · A) / d
+              </div>
 
-          {/* 2D Side View of Capacitor */}
-          <div 
-            id="capacitor-visual"
-            className={`relative flex flex-col items-center justify-center h-full w-full rounded-xl transition-all duration-300 ${isTargetActive('capacitor-visual') ? 'ring-4 ring-emerald-500 animate-pulse bg-emerald-900/20' : ''}`}
-          >
-            
-            {/* Top Plate (+) */}
-            <div 
-              className="bg-red-500/80 border-2 border-red-400 rounded-sm flex items-center justify-evenly overflow-hidden relative shadow-[0_10px_30px_rgba(239,68,68,0.3)] transition-all duration-300"
-              style={{ width: `${plateWidth}px`, height: '15px', marginBottom: `${gap/2}px` }}
-            >
-               {Array.from({ length: Math.min(Math.floor(charge * 1e10), 50) }).map((_, i) => (
-                 <span key={i} className="text-white text-[8px] font-bold">+</span>
-               ))}
-            </div>
+              {/* 2D Side View of Capacitor */}
+              <div 
+                id="capacitor-visual"
+                className={`relative flex flex-col items-center justify-center h-full w-full rounded-xl transition-all duration-300 ${isTargetActive('capacitor-visual') ? 'ring-4 ring-emerald-500 animate-pulse bg-emerald-900/20' : ''}`}
+              >
+                
+                {/* Top Plate (+) */}
+                <div 
+                  className="bg-red-500/80 border-2 border-red-400 rounded-sm flex items-center justify-evenly overflow-hidden relative shadow-[0_10px_30px_rgba(239,68,68,0.3)] transition-all duration-300"
+                  style={{ width: `${plateWidth}px`, height: '15px', marginBottom: `${gap/2}px` }}
+                >
+                   {Array.from({ length: Math.min(Math.floor(charge * 1e10), 50) }).map((_, i) => (
+                     <span key={i} className="text-white text-[8px] font-bold">+</span>
+                   ))}
+                </div>
 
-            {/* Electric Field Lines */}
-            <div 
-              className="absolute flex justify-evenly w-full pointer-events-none opacity-50 transition-all duration-300"
-              style={{ height: `${gap}px`, width: `${plateWidth - 10}px` }}
-            >
-              {Array.from({ length: Math.min(Math.floor(electricField / 100), 20) }).map((_, i) => (
-                 <div key={i} className="h-full w-px bg-gradient-to-b from-red-500 to-blue-500 relative">
-                   <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-0 h-0 border-l-[3px] border-r-[3px] border-t-[6px] border-l-transparent border-r-transparent border-t-slate-300"></div>
-                 </div>
-               ))}
-            </div>
+                {/* Electric Field Lines */}
+                <div 
+                  className="absolute flex justify-evenly w-full pointer-events-none opacity-50 transition-all duration-300"
+                  style={{ height: `${gap}px`, width: `${plateWidth - 10}px` }}
+                >
+                  {Array.from({ length: Math.min(Math.floor(electricField / 100), 20) }).map((_, i) => (
+                     <div key={i} className="h-full w-px bg-gradient-to-b from-red-500 to-blue-500 relative">
+                       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-0 h-0 border-l-[3px] border-r-[3px] border-t-[6px] border-l-transparent border-r-transparent border-t-slate-300"></div>
+                     </div>
+                   ))}
+                </div>
 
-            {/* Bottom Plate (-) */}
-            <div 
-              className="bg-blue-500/80 border-2 border-blue-400 rounded-sm flex items-center justify-evenly overflow-hidden shadow-[0_-10px_30px_rgba(59,130,246,0.3)] transition-all duration-300"
-              style={{ width: `${plateWidth}px`, height: '15px', marginTop: `${gap/2}px` }}
-            >
-               {Array.from({ length: Math.min(Math.floor(charge * 1e10), 50) }).map((_, i) => (
-                 <span key={i} className="text-white text-[8px] font-bold">-</span>
-               ))}
-            </div>
-            
-            {/* Dimension Labels */}
-            <div className="absolute right-10 top-1/2 -translate-y-1/2 text-slate-500 font-mono text-xs flex flex-col items-center gap-1">
-              <span>↑</span>
-              <span>d = {(distance * 100).toFixed(1)} cm</span>
-              <span>↓</span>
-            </div>
-          </div>
+                {/* Bottom Plate (-) */}
+                <div 
+                  className="bg-blue-500/80 border-2 border-blue-400 rounded-sm flex items-center justify-evenly overflow-hidden shadow-[0_-10px_30px_rgba(59,130,246,0.3)] transition-all duration-300"
+                  style={{ width: `${plateWidth}px`, height: '15px', marginTop: `${gap/2}px` }}
+                >
+                   {Array.from({ length: Math.min(Math.floor(charge * 1e10), 50) }).map((_, i) => (
+                     <span key={i} className="text-white text-[8px] font-bold">-</span>
+                   ))}
+                </div>
+                
+                {/* Dimension Labels */}
+                <div className="absolute right-10 top-1/2 -translate-y-1/2 text-slate-500 font-mono text-xs flex flex-col items-center gap-1">
+                  <span>↑</span>
+                  <span>d = {(distance * 100).toFixed(1)} cm</span>
+                  <span>↓</span>
+                </div>
+              </div>
 
-          <div className="absolute bottom-4 left-4 bg-slate-950/80 p-3 rounded-lg backdrop-blur text-xs font-mono text-slate-300 border border-slate-800">
-             Uniform E-Field: Lines are parallel and equally spaced.
-          </div>
+              <div className="absolute bottom-4 left-4 bg-slate-950/80 p-3 rounded-lg backdrop-blur text-xs font-mono text-slate-300 border border-slate-800">
+                 Uniform E-Field: Lines are parallel and equally spaced.
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Controls & Metrics Side Panel */}
