@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { PlusCircle, MinusCircle, RefreshCw, Layers, Move } from 'lucide-react';
+import { PlusCircle, MinusCircle, RefreshCw, Layers, Move, Activity, Share2 } from 'lucide-react';
 import { useTutorial } from '../contexts/TutorialContext';
+import GraphEngine from '../components/GraphEngine';
+import { useUrlState } from '../hooks/useUrlState';
 
 const VISUAL_K = 1000;
 
@@ -42,11 +44,12 @@ export default function Lab1() {
   const stateRef = useRef({});
   const { isTargetActive } = useTutorial();
 
-  const [charges, setCharges] = useState([
+  // Replaced useState with useUrlState to enable shareable links!
+  const [charges, setCharges] = useUrlState('lab1_chg', [
     { id: 1, x: -3, y: 0, q: 1 },
     { id: 2, x: 3, y: 0, q: -1 },
   ]);
-  const [testCharge, setTestCharge] = useState({ x: 0, y: -4, q: 0.1 });
+  const [testCharge, setTestCharge] = useUrlState('lab1_test', { x: 0, y: -4, q: 0.1 });
   const [viewMode, setViewMode] = useState('field');
   const draggingRef = useRef({ mode: 'none', id: null });
 
@@ -174,6 +177,24 @@ export default function Lab1() {
   const currentE = calculateE(charges, testCharge.x, testCharge.y);
   const currentU = testCharge.q * currentV;
 
+  // Compute data for Graph Engine (Scanning along Y = 0 axis)
+  const graphData = React.useMemo(() => {
+    const data = [];
+    for (let x = -10; x <= 10; x += 0.5) {
+      // Avoid singularities exactly at charge locations
+      const safeX = x + 0.01; 
+      const v = calculateV(charges, safeX, 0);
+      const e = calculateE(charges, safeX, 0).Emag;
+      // Cap values for graph readability
+      data.push({
+        x: Number(x.toFixed(1)),
+        v: Math.max(Math.min(v, 2000), -2000),
+        e: Math.min(e, 2000)
+      });
+    }
+    return data;
+  }, [charges]);
+
   return (
     <div className="p-6 h-full flex flex-col max-w-7xl mx-auto">
       <header className="mb-6">
@@ -272,34 +293,16 @@ export default function Lab1() {
             </div>
           </div>
 
-          <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-xl flex-1 overflow-y-auto custom-scrollbar">
-            <h3 className="text-xs font-black uppercase text-slate-500 tracking-widest mb-4">Key Concepts</h3>
-            <div className="space-y-4 text-sm">
-              <div>
-                <strong className="text-white block">Conservative Forces</strong>
-                <p className="text-xs text-slate-400 leading-relaxed mt-1">
-                  Move the test charge in a closed loop. U returns to the same value — proving electrostatic forces are conservative.
-                </p>
-              </div>
-              <div>
-                <strong className="text-white block">Equipotential Surfaces</strong>
-                <p className="text-xs text-slate-400 leading-relaxed mt-1">
-                  Regions of constant V. Electric field lines are always perpendicular to them.
-                </p>
-              </div>
-              <div>
-                <strong className="text-white block">System of Charges</strong>
-                <p className="text-xs text-slate-400 leading-relaxed mt-1">
-                  Total V = algebraic sum of individual potentials. Add + and - charges close together to create a dipole!
-                </p>
-              </div>
-              <div>
-                <strong className="text-white block">Electric Dipole</strong>
-                <p className="text-xs text-slate-400 leading-relaxed mt-1">
-                  A pair of equal and opposite charges. On the equatorial line, V = 0. On the axial line, V is maximum.
-                </p>
-              </div>
-            </div>
+          <div className="bg-slate-900 border border-slate-800 rounded-xl flex-1 overflow-hidden shadow-xl min-h-[250px]">
+            <GraphEngine 
+              title="V & E vs Distance (y=0)"
+              data={graphData} 
+              xKey="x"
+              lines={[
+                { key: 'v', color: '#ef4444', name: 'Potential V' },
+                { key: 'e', color: '#eab308', name: 'E-Field Mag' }
+              ]}
+            />
           </div>
         </div>
       </div>
