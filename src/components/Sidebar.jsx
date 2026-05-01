@@ -1,8 +1,15 @@
 import React from 'react';
 import { Beaker, Zap, Layers, Network, Activity, ChevronRight, GraduationCap } from 'lucide-react';
 import { useTutorial } from '../contexts/TutorialContext';
+import UserStats from './UserStats';
 
 const LABS = [
+  {
+    id: 'Dashboard',
+    title: 'Scientist Dashboard',
+    desc: 'Analytics & Progress',
+    icon: Activity
+  },
   {
     id: 'Lab1',
     title: 'The Potential Playground',
@@ -89,6 +96,8 @@ export default function Sidebar({ activeLab, setActiveLab }) {
         </h1>
         <p className="text-xs text-slate-500 mt-1 uppercase tracking-widest font-bold">Class 12 Electrostatics</p>
       </div>
+      
+      <UserStats />
       
       <div className="flex-1 overflow-y-auto custom-scrollbar p-3 space-y-2">
         {LABS.map((lab) => {

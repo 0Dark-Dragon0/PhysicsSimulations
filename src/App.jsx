@@ -6,13 +6,16 @@ import Lab3 from './labs/Lab3';
 import Lab4 from './labs/Lab4';
 import Lab5 from './labs/Lab5';
 import { TutorialProvider } from './contexts/TutorialContext';
+import { UserProvider } from './contexts/UserContext';
 import TeacherAssistant from './components/TeacherAssistant';
+import Dashboard from './components/Dashboard';
 
 function App() {
   const [activeLab, setActiveLab] = useState('Lab1');
 
   const renderLab = () => {
     switch(activeLab) {
+      case 'Dashboard': return <Dashboard />;
       case 'Lab1': return <Lab1 />;
       case 'Lab2': return <Lab2 />;
       case 'Lab3': return <Lab3 />;
@@ -23,15 +26,17 @@ function App() {
   };
 
   return (
-    <TutorialProvider>
-      <div className="flex h-screen bg-slate-950 text-slate-300 font-sans overflow-hidden">
-        <Sidebar activeLab={activeLab} setActiveLab={setActiveLab} />
-        <main className="flex-1 overflow-y-auto relative">
-          {renderLab()}
-          <TeacherAssistant />
-        </main>
-      </div>
-    </TutorialProvider>
+    <UserProvider>
+      <TutorialProvider>
+        <div className="flex h-screen bg-slate-950 text-slate-300 font-sans overflow-hidden">
+          <Sidebar activeLab={activeLab} setActiveLab={setActiveLab} />
+          <main className="flex-1 overflow-y-auto relative">
+            {renderLab()}
+            <TeacherAssistant />
+          </main>
+        </div>
+      </TutorialProvider>
+    </UserProvider>
   );
 }
 

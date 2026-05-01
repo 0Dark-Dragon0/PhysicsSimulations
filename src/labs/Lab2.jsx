@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
-import { Beaker, Settings2, Zap } from 'lucide-react';
+import { Beaker, Settings2, Zap, FlaskConical } from 'lucide-react';
 import { useTutorial } from '../contexts/TutorialContext';
+import ExperimentWizard from '../components/ExperimentWizard';
+import { experimentsData } from '../data/experiments';
 
 export default function Lab2() {
   const { isTargetActive } = useTutorial();
+  const [showExperiment, setShowExperiment] = useState(false);
   const [area, setArea] = useState(1.0); // m^2 (0.1 to 5.0)
   const [distance, setDistance] = useState(0.01); // m (0.001 to 0.05)
   const [voltage, setVoltage] = useState(12); // V (0 to 100)
@@ -22,16 +25,36 @@ export default function Lab2() {
   
   return (
     <div className="p-6 h-full flex flex-col max-w-7xl mx-auto">
-      <header className="mb-6">
-        <h1 className="text-3xl font-black text-white flex items-center gap-3">
-          <Beaker className="text-blue-500" /> Capacitance Fundamentals
-        </h1>
-        <p className="text-slate-400 mt-1">
-          Explore the physics of the Parallel Plate Capacitor. Adjust physical dimensions to see real-time effects on Capacity, Charge, and Energy.
-        </p>
+      <header className="mb-6 flex justify-between items-start">
+        <div>
+          <h1 className="text-3xl font-black text-white flex items-center gap-3">
+            <Beaker className="text-blue-500" /> Parallel Plate Capacitor
+          </h1>
+          <p className="text-slate-400 mt-1">
+            Investigate how plate area and separation distance affect capacitance and stored energy.
+          </p>
+        </div>
+        <button 
+          onClick={() => setShowExperiment(true)}
+          className="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg font-bold text-sm shadow-lg shadow-indigo-900/50 transition-colors flex items-center gap-2"
+        >
+          <FlaskConical size={16} /> Start Virtual Lab
+        </button>
       </header>
       
-      <div className="flex gap-6 h-[600px]">
+      <div className="flex gap-6 relative" style={{ height: '600px' }}>
+        
+        {/* Experiment Wizard Overlay */}
+        {showExperiment && (
+          <div className="absolute top-0 right-80 bottom-0 mr-6 z-20">
+            <ExperimentWizard 
+              experiment={experimentsData.Lab2} 
+              currentValues={{ area: area.toFixed(2), capacitance_pf: (capacitance * 1e12).toFixed(2) }}
+              onClose={() => setShowExperiment(false)}
+            />
+          </div>
+        )}
+
         {/* Main Simulation View */}
         <div className="flex-1 bg-slate-900 border border-slate-800 rounded-xl shadow-2xl relative flex flex-col items-center justify-center overflow-hidden">
           
