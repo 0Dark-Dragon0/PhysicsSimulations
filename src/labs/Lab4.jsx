@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { Network, Plus, Trash2, Zap } from 'lucide-react';
+import { useTutorial } from '../contexts/TutorialContext';
 
 export default function Lab4() {
+  const { isTargetActive } = useTutorial();
   const [config, setConfig] = useState('series');
   const [capacitors, setCapacitors] = useState([
     { id: 1, c: 2 },
@@ -63,21 +65,26 @@ export default function Lab4() {
 
           <div className="flex justify-center gap-4 mb-8 z-10">
             <button
+              id="btn-series"
               onClick={() => setConfig('series')}
-              className={`px-4 py-2 rounded-lg font-bold text-sm transition-colors ${config === 'series' ? 'bg-amber-600 text-white' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'}`}
+              className={`px-4 py-2 rounded-lg font-bold text-sm transition-all duration-300 ${config === 'series' ? 'bg-amber-600 text-white' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'} ${isTargetActive('btn-series') ? 'ring-4 ring-emerald-500 animate-pulse' : ''}`}
             >
               Series Combination
             </button>
             <button
+              id="btn-parallel"
               onClick={() => setConfig('parallel')}
-              className={`px-4 py-2 rounded-lg font-bold text-sm transition-colors ${config === 'parallel' ? 'bg-amber-600 text-white' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'}`}
+              className={`px-4 py-2 rounded-lg font-bold text-sm transition-all duration-300 ${config === 'parallel' ? 'bg-amber-600 text-white' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'} ${isTargetActive('btn-parallel') ? 'ring-4 ring-emerald-500 animate-pulse' : ''}`}
             >
               Parallel Combination
             </button>
           </div>
 
           {/* Circuit Diagram */}
-          <div className="flex-1 flex items-center justify-center relative">
+          <div 
+            id="circuit-display"
+            className={`flex-1 flex items-center justify-center relative rounded-xl transition-all duration-300 ${isTargetActive('circuit-display') ? 'ring-4 ring-emerald-500 animate-pulse bg-emerald-900/10' : ''}`}
+          >
             {config === 'series' ? (
               <div className="flex items-center relative z-10">
                 <div className="w-16 h-1 bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]" />

@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { Beaker, Settings2, Zap } from 'lucide-react';
+import { useTutorial } from '../contexts/TutorialContext';
 
 export default function Lab2() {
+  const { isTargetActive } = useTutorial();
   const [area, setArea] = useState(1.0); // m^2 (0.1 to 5.0)
   const [distance, setDistance] = useState(0.01); // m (0.001 to 0.05)
   const [voltage, setVoltage] = useState(12); // V (0 to 100)
@@ -38,7 +40,10 @@ export default function Lab2() {
           </div>
 
           {/* 2D Side View of Capacitor */}
-          <div className="relative flex flex-col items-center justify-center h-full w-full">
+          <div 
+            id="capacitor-visual"
+            className={`relative flex flex-col items-center justify-center h-full w-full rounded-xl transition-all duration-300 ${isTargetActive('capacitor-visual') ? 'ring-4 ring-emerald-500 animate-pulse bg-emerald-900/20' : ''}`}
+          >
             
             {/* Top Plate (+) */}
             <div 
@@ -98,7 +103,8 @@ export default function Lab2() {
                   <label>Plate Area (A)</label>
                   <span className="font-mono text-white">{area.toFixed(2)} m²</span>
                 </div>
-                <input type="range" min="0.1" max="5.0" step="0.1" value={area} onChange={(e)=>setArea(Number(e.target.value))} className="w-full accent-blue-500" />
+                <input id="slider-area" type="range" min="0.1" max="5.0" step="0.1" value={area} onChange={(e)=>setArea(Number(e.target.value))} 
+                  className={`w-full accent-blue-500 transition-all duration-300 ${isTargetActive('slider-area') ? 'ring-4 ring-emerald-500 rounded animate-pulse' : ''}`} />
               </div>
               
               <div>
@@ -106,7 +112,8 @@ export default function Lab2() {
                   <label>Separation (d)</label>
                   <span className="font-mono text-white">{(distance * 100).toFixed(1)} cm</span>
                 </div>
-                <input type="range" min="0.001" max="0.05" step="0.001" value={distance} onChange={(e)=>setDistance(Number(e.target.value))} className="w-full accent-blue-500" />
+                <input id="slider-dist" type="range" min="0.001" max="0.05" step="0.001" value={distance} onChange={(e)=>setDistance(Number(e.target.value))} 
+                  className={`w-full accent-blue-500 transition-all duration-300 ${isTargetActive('slider-dist') ? 'ring-4 ring-emerald-500 rounded animate-pulse' : ''}`} />
               </div>
 
               <div className="h-px bg-slate-800 w-full"></div>
@@ -116,7 +123,8 @@ export default function Lab2() {
                   <label>Applied Voltage (V)</label>
                   <span className="font-mono text-white">{voltage} V</span>
                 </div>
-                <input type="range" min="0" max="100" step="1" value={voltage} onChange={(e)=>setVoltage(Number(e.target.value))} className="w-full accent-amber-500" />
+                <input id="slider-voltage" type="range" min="0" max="100" step="1" value={voltage} onChange={(e)=>setVoltage(Number(e.target.value))} 
+                  className={`w-full accent-amber-500 transition-all duration-300 ${isTargetActive('slider-voltage') ? 'ring-4 ring-emerald-500 rounded animate-pulse' : ''}`} />
               </div>
             </div>
           </div>
@@ -140,7 +148,10 @@ export default function Lab2() {
                 </div>
               </div>
 
-              <div className="bg-slate-950 p-3 rounded-lg border border-slate-800">
+              <div 
+                id="metric-energy"
+                className={`bg-slate-950 p-3 rounded-lg border transition-all duration-300 ${isTargetActive('metric-energy') ? 'border-emerald-500 ring-4 ring-emerald-500/50 animate-pulse bg-emerald-950/30' : 'border-slate-800'}`}
+              >
                 <div className="text-[10px] text-slate-500 uppercase tracking-wider mb-1">Stored Energy (U = ½CV²)</div>
                 <div className="text-xl font-mono font-bold text-emerald-400">
                   {(energy * 1e9).toFixed(2)} <span className="text-sm font-sans text-slate-600">nJ</span>

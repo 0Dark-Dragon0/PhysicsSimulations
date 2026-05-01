@@ -5,6 +5,8 @@ import Lab2 from './labs/Lab2';
 import Lab3 from './labs/Lab3';
 import Lab4 from './labs/Lab4';
 import Lab5 from './labs/Lab5';
+import { TutorialProvider } from './contexts/TutorialContext';
+import TeacherAssistant from './components/TeacherAssistant';
 
 function App() {
   const [activeLab, setActiveLab] = useState('Lab1');
@@ -21,12 +23,15 @@ function App() {
   };
 
   return (
-    <div className="flex h-screen bg-slate-950 text-slate-300 font-sans overflow-hidden">
-      <Sidebar activeLab={activeLab} setActiveLab={setActiveLab} />
-      <main className="flex-1 overflow-y-auto relative">
-        {renderLab()}
-      </main>
-    </div>
+    <TutorialProvider>
+      <div className="flex h-screen bg-slate-950 text-slate-300 font-sans overflow-hidden">
+        <Sidebar activeLab={activeLab} setActiveLab={setActiveLab} />
+        <main className="flex-1 overflow-y-auto relative">
+          {renderLab()}
+          <TeacherAssistant />
+        </main>
+      </div>
+    </TutorialProvider>
   );
 }
 

@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Zap, Link as LinkIcon, PowerOff, RotateCcw } from 'lucide-react';
+import { useTutorial } from '../contexts/TutorialContext';
 
 export default function Lab5() {
+  const { isTargetActive } = useTutorial();
   const [c1, setC1] = useState(2);
   const [c2, setC2] = useState(4);
   const [v1Init, setV1Init] = useState(20);
@@ -77,7 +79,10 @@ export default function Lab5() {
 
       <div className="flex gap-6" style={{ height: '600px' }}>
         {/* Circuit Diagram */}
-        <div className="flex-1 bg-slate-900 border border-slate-800 rounded-xl shadow-2xl relative flex flex-col overflow-hidden">
+        <div 
+          id="circuit-display"
+          className={`flex-1 bg-slate-900 border border-slate-800 rounded-xl shadow-2xl relative flex flex-col overflow-hidden transition-all duration-300 ${isTargetActive('circuit-display') ? 'ring-4 ring-emerald-500 animate-pulse bg-emerald-900/10' : ''}`}
+        >
 
           <div className="flex-1 relative flex items-center justify-center">
             {/* Top wire */}
@@ -92,14 +97,15 @@ export default function Lab5() {
             {/* Switch in middle of top wire */}
             <div className="absolute z-20 bg-slate-900 p-2 rounded-full" style={{ top: '33%', left: '50%', transform: 'translate(-50%, -50%)' }}>
               <button
+                id="btn-switch"
                 onClick={connected ? reset : connectSwitch}
                 disabled={animating}
                 title={connected ? 'Reset Circuit' : 'Close Switch'}
-                className={`p-3 rounded-full border-2 transition-all disabled:cursor-not-allowed ${
+                className={`p-3 rounded-full border-2 transition-all duration-300 disabled:cursor-not-allowed ${
                   connected
                     ? 'bg-red-500/20 border-red-500 text-red-400'
                     : 'bg-emerald-500/20 border-emerald-500 text-emerald-400 hover:bg-emerald-500/40'
-                }`}
+                } ${isTargetActive('btn-switch') ? 'ring-4 ring-emerald-500 animate-pulse' : ''}`}
               >
                 {connected ? <PowerOff size={22} /> : <LinkIcon size={22} />}
               </button>
@@ -155,7 +161,10 @@ export default function Lab5() {
           </div>
 
           {/* Metrics Footer */}
-          <div className="grid grid-cols-3 gap-0 bg-slate-950 border-t border-slate-800">
+          <div 
+            id="metrics-footer"
+            className={`grid grid-cols-3 gap-0 bg-slate-950 border-t border-slate-800 transition-all duration-300 ${isTargetActive('metrics-footer') ? 'ring-4 ring-emerald-500 animate-pulse' : ''}`}
+          >
             <div className="p-5 text-center">
               <div className="text-[10px] text-slate-500 uppercase tracking-widest mb-2">Total Charge Q</div>
               <div className="text-2xl font-mono font-bold text-red-400">
@@ -199,7 +208,10 @@ export default function Lab5() {
 
             <h3 className="text-xs font-black uppercase text-slate-500 tracking-widest mb-4">Initial Setup</h3>
 
-            <div className={`space-y-5 ${connected ? 'opacity-40 pointer-events-none' : ''}`}>
+            <div 
+              id="setup-panel"
+              className={`space-y-5 transition-all duration-300 ${connected ? 'opacity-40 pointer-events-none' : ''} ${isTargetActive('setup-panel') ? 'ring-4 ring-emerald-500 rounded-xl p-2 animate-pulse bg-emerald-900/10' : ''}`}
+            >
               <div>
                 <div className="flex justify-between text-xs text-slate-400 mb-2">
                   <label>Capacitor 1 (C1)</label>
@@ -252,12 +264,15 @@ export default function Lab5() {
               </button>
             )}
 
-            <div className="mt-5 p-3 bg-slate-950/50 rounded border border-slate-800 text-xs text-slate-400 leading-relaxed">
+            <div 
+              id="info-energy"
+              className={`mt-5 p-3 rounded border text-xs leading-relaxed transition-all duration-300 ${isTargetActive('info-energy') ? 'bg-emerald-950/50 border-emerald-500 text-emerald-400 ring-4 ring-emerald-500 animate-pulse' : 'bg-slate-950/50 border-slate-800 text-slate-400'}`}
+            >
               <strong className="text-white block mb-2">Energy Loss Formula:</strong>
               <div className="font-mono text-blue-400 text-center py-2 bg-slate-950 rounded border border-slate-800">
                 dU = (C1 × C2) / (2(C1+C2)) × (V1-V2)²
               </div>
-              <p className="mt-2">Energy loss is always positive when V1 ≠ V2. This is an irreversible process — the energy is lost as heat or electromagnetic radiation from the spark.</p>
+              <p className="mt-2 text-inherit">Energy loss is always positive when V1 ≠ V2. This is an irreversible process — the energy is lost as heat or electromagnetic radiation from the spark.</p>
             </div>
           </div>
         </div>

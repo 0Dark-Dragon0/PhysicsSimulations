@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { PlusCircle, MinusCircle, RefreshCw, Layers, Move } from 'lucide-react';
+import { useTutorial } from '../contexts/TutorialContext';
 
 const VISUAL_K = 1000;
 
@@ -39,6 +40,7 @@ function toPhysics(cx, cy, width, height) {
 export default function Lab1() {
   const canvasRef = useRef(null);
   const stateRef = useRef({});
+  const { isTargetActive } = useTutorial();
 
   const [charges, setCharges] = useState([
     { id: 1, x: -3, y: 0, q: 1 },
@@ -185,24 +187,28 @@ export default function Lab1() {
 
       <div className="flex gap-6" style={{ height: '600px' }}>
         {/* Canvas */}
-        <div className="flex-1 bg-slate-900 border border-slate-800 rounded-xl overflow-hidden shadow-2xl relative">
+        <div 
+          id="canvas-area"
+          className={`flex-1 bg-slate-900 border border-slate-800 rounded-xl overflow-hidden shadow-2xl relative transition-all duration-300 ${isTargetActive('canvas-area') ? 'ring-4 ring-emerald-500 animate-pulse' : ''}`}
+        >
 
           <div className="absolute top-3 left-3 flex gap-2 z-10 bg-slate-950/80 p-1.5 rounded-lg backdrop-blur-sm">
             {['field', 'potential', 'both'].map(m => (
               <button key={m} onClick={() => setViewMode(m)}
-                className={`px-3 py-1 text-xs font-bold rounded transition-colors ${viewMode === m ? 'bg-emerald-600 text-white' : 'text-slate-400 hover:bg-slate-800'}`}>
+                id={m === 'potential' ? 'btn-mode-equi' : m === 'both' ? 'btn-mode-both' : ''}
+                className={`px-3 py-1 text-xs font-bold rounded transition-all duration-300 ${viewMode === m ? 'bg-emerald-600 text-white' : 'text-slate-400 hover:bg-slate-800'} ${isTargetActive(m === 'potential' ? 'btn-mode-equi' : m === 'both' ? 'btn-mode-both' : '') ? 'ring-4 ring-emerald-500 animate-pulse bg-emerald-900' : ''}`}>
                 {m === 'field' ? 'Vector Field' : m === 'potential' ? 'Equipotentials' : 'Both'}
               </button>
             ))}
           </div>
 
           <div className="absolute top-3 right-3 flex gap-2 z-10 bg-slate-950/80 p-1.5 rounded-lg backdrop-blur-sm">
-            <button onClick={() => addCharge(1)} title="Add +q"
-              className="p-1.5 bg-red-500/20 text-red-400 rounded hover:bg-red-500/40">
+            <button id="btn-add-pos" onClick={() => addCharge(1)} title="Add +q"
+              className={`p-1.5 bg-red-500/20 text-red-400 rounded hover:bg-red-500/40 transition-all duration-300 ${isTargetActive('btn-add-pos') ? 'ring-4 ring-emerald-500 animate-pulse' : ''}`}>
               <PlusCircle size={18} />
             </button>
-            <button onClick={() => addCharge(-1)} title="Add -q"
-              className="p-1.5 bg-blue-500/20 text-blue-400 rounded hover:bg-blue-500/40">
+            <button id="btn-add-neg" onClick={() => addCharge(-1)} title="Add -q"
+              className={`p-1.5 bg-blue-500/20 text-blue-400 rounded hover:bg-blue-500/40 transition-all duration-300 ${isTargetActive('btn-add-neg') ? 'ring-4 ring-emerald-500 animate-pulse' : ''}`}>
               <MinusCircle size={18} />
             </button>
             <div className="w-px bg-slate-700 mx-1" />
@@ -232,7 +238,10 @@ export default function Lab1() {
 
         {/* Side Panel */}
         <div className="w-80 flex flex-col gap-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-xl">
+          <div 
+            id="metrics-panel"
+            className={`bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-xl transition-all duration-300 ${isTargetActive('metrics-panel') ? 'ring-4 ring-emerald-500 animate-pulse' : ''}`}
+          >
             <h3 className="text-xs font-black uppercase text-slate-500 tracking-widest mb-4">
               Live Metrics at Test Charge
             </h3>

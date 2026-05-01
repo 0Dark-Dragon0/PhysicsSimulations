@@ -1,5 +1,6 @@
 import React from 'react';
-import { Beaker, Zap, Layers, Network, Activity, ChevronRight } from 'lucide-react';
+import { Beaker, Zap, Layers, Network, Activity, ChevronRight, GraduationCap } from 'lucide-react';
+import { useTutorial } from '../contexts/TutorialContext';
 
 const LABS = [
   {
@@ -72,6 +73,13 @@ const LABS = [
 ];
 
 export default function Sidebar({ activeLab, setActiveLab }) {
+  const { isGuidedMode, toggleGuidedMode, setActiveLabId } = useTutorial();
+
+  const handleLabChange = (id) => {
+    setActiveLab(id);
+    setActiveLabId(id);
+  };
+
   return (
     <aside className="w-80 bg-slate-900 border-r border-slate-800 flex flex-col h-full shadow-2xl z-10 flex-shrink-0">
       <div className="p-5 border-b border-slate-800">
@@ -89,7 +97,7 @@ export default function Sidebar({ activeLab, setActiveLab }) {
           return (
             <div key={lab.id} className="mb-2">
               <button
-                onClick={() => setActiveLab(lab.id)}
+                onClick={() => handleLabChange(lab.id)}
                 className={`w-full flex items-center justify-between p-3 rounded-lg border transition-all duration-200 ${
                   isActive 
                     ? 'bg-slate-800 border-slate-600 shadow-lg' 
@@ -120,8 +128,19 @@ export default function Sidebar({ activeLab, setActiveLab }) {
         })}
       </div>
 
-      <div className="p-4 border-t border-slate-800 text-center">
-        <p className="text-[10px] text-slate-600 uppercase tracking-widest">Antigravity Simulation Engine</p>
+      <div className="p-4 border-t border-slate-800 flex flex-col gap-3">
+        <button 
+          onClick={toggleGuidedMode}
+          className={`w-full py-2.5 rounded-lg flex items-center justify-center gap-2 font-bold text-sm transition-all shadow-lg ${
+            isGuidedMode 
+              ? 'bg-emerald-600 text-white shadow-emerald-900/50 ring-2 ring-emerald-400' 
+              : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+          }`}
+        >
+          <GraduationCap size={18} />
+          {isGuidedMode ? 'Exit Teacher Mode' : 'Start Teacher Mode'}
+        </button>
+        <p className="text-[10px] text-slate-600 uppercase tracking-widest text-center mt-2">Antigravity Simulation Engine</p>
       </div>
     </aside>
   );

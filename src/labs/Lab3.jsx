@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { Layers, Zap } from 'lucide-react';
+import { useTutorial } from '../contexts/TutorialContext';
 
 export default function Lab3() {
+  const { isTargetActive } = useTutorial();
   const [insertion, setInsertion] = useState(0); // 0 to 100%
   const [materialType, setMaterialType] = useState('dielectric'); // 'dielectric' or 'conducting'
   const [dielectricConstant, setDielectricConstant] = useState(5.0); // K (kappa)
@@ -46,14 +48,16 @@ export default function Lab3() {
           
           <div className="absolute top-4 left-4 z-10 flex gap-2">
             <button 
+              id="btn-dielectric"
               onClick={() => setMaterialType('dielectric')} 
-              className={`px-3 py-1 rounded text-xs font-bold ${materialType === 'dielectric' ? 'bg-purple-600 text-white' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'}`}
+              className={`px-3 py-1 rounded text-xs font-bold transition-all duration-300 ${materialType === 'dielectric' ? 'bg-purple-600 text-white' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'} ${isTargetActive('btn-dielectric') ? 'ring-4 ring-emerald-500 animate-pulse' : ''}`}
             >
               Dielectric Slab
             </button>
             <button 
+              id="btn-conducting"
               onClick={() => setMaterialType('conducting')} 
-              className={`px-3 py-1 rounded text-xs font-bold ${materialType === 'conducting' ? 'bg-slate-300 text-slate-900' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'}`}
+              className={`px-3 py-1 rounded text-xs font-bold transition-all duration-300 ${materialType === 'conducting' ? 'bg-slate-300 text-slate-900' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'} ${isTargetActive('btn-conducting') ? 'ring-4 ring-emerald-500 animate-pulse' : ''}`}
             >
               Conducting Slab
             </button>
@@ -128,7 +132,8 @@ export default function Lab3() {
                   <label>Insertion Ratio</label>
                   <span className="font-mono text-white">{insertion.toFixed(0)} %</span>
                 </div>
-                <input type="range" min="0" max="100" step="1" value={insertion} onChange={(e)=>setInsertion(Number(e.target.value))} className="w-full accent-purple-500" />
+                <input id="slider-insertion" type="range" min="0" max="100" step="1" value={insertion} onChange={(e)=>setInsertion(Number(e.target.value))} 
+                  className={`w-full accent-purple-500 transition-all duration-300 ${isTargetActive('slider-insertion') ? 'ring-4 ring-emerald-500 rounded animate-pulse' : ''}`} />
               </div>
               
               {materialType === 'dielectric' && (
@@ -148,7 +153,10 @@ export default function Lab3() {
             <h3 className="text-xs font-black uppercase text-slate-500 tracking-widest mb-4 flex items-center gap-2"><Zap size={16}/> Effects (Battery Connected)</h3>
             
             <div className="space-y-4">
-              <div className="bg-slate-950 p-3 rounded-lg border border-slate-800">
+              <div 
+                id="metric-capacitance"
+                className={`bg-slate-950 p-3 rounded-lg border transition-all duration-300 ${isTargetActive('metric-capacitance') ? 'border-emerald-500 ring-4 ring-emerald-500/50 animate-pulse bg-emerald-950/30' : 'border-slate-800'}`}
+              >
                 <div className="text-[10px] text-slate-500 uppercase tracking-wider mb-1">Equivalent Capacitance (C)</div>
                 <div className="text-xl font-mono font-bold text-blue-400">
                   {(C * 1e12).toFixed(2)} <span className="text-sm font-sans text-slate-600">pF</span>
